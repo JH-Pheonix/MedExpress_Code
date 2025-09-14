@@ -103,8 +103,6 @@ def barcode(image, debug=False):
     # 返回检测结果，同时包含解码信息（如果有）
     return {'box': box, 'rect': (x, y, w, h), 'roi': roi, 'decoded': decoded_list}
 
-
-# 示例用法（仅作为说明；在实际脚本中调用时请根据需要启用）
 # if __name__ == '__main__':
 #     img = cv2.imread('test.png')
 #     res = barcode(img, debug=True)
@@ -114,7 +112,7 @@ def barcode(image, debug=False):
 #     cv2.waitKey(0)
 #     cv2.destroyAllWindows()
 
-def main():
+if __name__ == '__main__':
     img_path = 'test22.png'
     img = cv2.imread(img_path)
     if img is None:
@@ -137,17 +135,11 @@ def main():
         # 如果有旋转 box，绘制已在函数中完成；这里再高亮 ROI
         roi = res.get('roi')
         if roi is not None:
-            # 不保存 ROI，仅保存并展示带标注的整图
+            # 不保存 ROI
             pass
-        # 保存带标注的整图
         cv2.imwrite('barcode_result.png', img)
 
-    # 只显示带标注的最终结果窗口，按任意键关闭
     cv2.imshow('barcode_result', img)
     print('按任意键关闭窗口...')
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-
-
-if __name__ == '__main__':
-    main()
