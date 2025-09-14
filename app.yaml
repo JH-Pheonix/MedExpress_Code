@@ -1,0 +1,17 @@
+id: qrcode_1
+name: 护士台
+version: 1.0.0
+author: ZeroHzzzz
+icon: ''
+desc: 扫描二维码，发送串口信息
+files:
+  - .python-version
+  - barcode.py
+  - correction.py
+  - main.py
+  - pyproject.toml
+  - qrcode.py
+  - README.md
+  - test.png
+  - uart.py
+  - uv.lock
