@@ -11,7 +11,7 @@ for pin, func in pin_function.items():
 
 serial0 = uart.UART(device, 115200)
 
-cam = camera.Camera(320, 240)
+cam = camera.Camera(640, 480 ,image.Format.FMT_GRAYSCALE)
 disp = display.Display()
 
 def int_to_bytes(n: int, byteorder: Literal['big', 'little'] = 'big', signed: bool = False, byte_count: int = None, truncate: bool = False):
@@ -131,6 +131,7 @@ def make_packet(payload, cmd: int = 0x00):
 
 while 1:
     img = cam.read()
+    # img = img.lens_corr(strength=1.5)
 
     qrcodes = img.find_qrcodes()
     barcodes = img.find_barcodes()
