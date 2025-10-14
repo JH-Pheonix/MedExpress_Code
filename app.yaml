@@ -1,6 +1,6 @@
 id: qrcode_1
-name: 护士台
-version: 2.0.2
+name: MedExpress_Code
+version: 2.0.4
 author: ZeroHzzzz
 icon: ''
 desc: 扫描二维码，发送串口信息

@@ -1,5 +1,6 @@
 from maix import image, uart, camera, display, pinmap, err
 from typing import Literal
+import cv2
 
 device = "/dev/ttyS1"
 pin_function = {
@@ -11,7 +12,7 @@ for pin, func in pin_function.items():
 
 serial0 = uart.UART(device, 115200)
 
-cam = camera.Camera(640, 480 ,image.Format.FMT_GRAYSCALE)
+cam = camera.Camera(480, 320 ,image.Format.FMT_GRAYSCALE)
 disp = display.Display()
 
 def int_to_bytes(n: int, byteorder: Literal['big', 'little'] = 'big', signed: bool = False, byte_count: int = None, truncate: bool = False):
@@ -131,22 +132,30 @@ def make_packet(payload, cmd: int = 0x00):
 
 while 1:
     img = cam.read()
+
+    # img_cv = image.image2cv(img, copy=True)
+    # bin_img = cv2.adaptiveThreshold(img_cv, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2)
+    # closed = cv2.morphologyEx(bin_img, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3)))
+    # contours, _ = cv2.findContours(closed, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+    # img = img.binary(thresholds=thresholds, invert=False, zero=True)
+    # img = img.invert()
     # img = img.lens_corr(strength=1.5)
 
     qrcodes = img.find_qrcodes()
     barcodes = img.find_barcodes()
 
-
-
     # 优先处理 barcode：如果同时扫到 QR code 和 barcode，只处理 barcode
     if barcodes:
         for b in barcodes:
             rect = b.rect()
+            # 画框
             img.draw_rect(rect[0], rect[1], rect[2], rect[3], image.COLOR_BLUE, 2)
+            img.draw_string(b.x(), b.y() - 30, "payload: " + b.payload(), image.COLOR_RED, scale=2)
+
             payload_str = b.payload()
             cmd = 0x01  # 条码使用命令字 0x01
             packet = make_packet(payload_str, cmd)
-            img.draw_string(b.x(), b.y() - 15, "payload: " + b.payload(), image.COLOR_GREEN)
             try:
                 serial0.write(packet)
                 print("Sent packet:", packet)
@@ -158,7 +167,7 @@ while 1:
             corners = qr.corners()
             for i in range(4):
                 img.draw_line(corners[i][0], corners[i][1], corners[(i + 1) % 4][0], corners[(i + 1) % 4][1], image.COLOR_RED)
-            img.draw_string(qr.x(), qr.y() - 15, qr.payload(), image.COLOR_RED)
+            img.draw_string(qr.x(), qr.y() - 30, qr.payload(), image.COLOR_RED, scale=2)
             payload_str = qr.payload()
             cmd = 0x00  # QR code 使用命令字 0x00
             # 构建并发送数据包
